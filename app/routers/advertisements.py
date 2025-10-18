@@ -7,7 +7,32 @@ from app.database.database import get_db
 from app.models.advertisement import Advertisement
 from app.schemas.advertisement import Advertisement as AdvertisementSchema, AdvertisementCreate, AdvertisementUpdate
 
-router = APIRouter(prefix="/advertisement", tags=['advertisements'])
+router = APIRouter(prefix="/advertisement", tags=["advertisements"])
+
+# ИСПРАВЛЕНИЕ: Убрал слеш в пути, теперь путь будет "/advertisement"
+@router.post("", response_model=AdvertisementSchema)
+async def create_advertisement(
+    advertisement: AdvertisementCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    db_advertisement = Advertisement(**advertisement.model_dump())
+    db.add(db_advertisement)
+    await db.commit()
+    await db.refresh(db_advertisement)
+    return db_advertisement
+
+@router.get("/{advertisement_id}", response_model=AdvertisementSchema)
+async def get_advertisement(
+    advertisement_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(Advertisement).where(Advertisement.id == advertisement_id))
+    advertisement = result.scalar_one_or_none()
+    
+    if advertisement is None:
+        raise HTTPException(status_code=404, detail="Advertisement not found")
+    
+    return advertisement
 
 @router.patch("/{advertisement_id}", response_model=AdvertisementSchema)
 async def update_advertisement(
@@ -17,14 +42,14 @@ async def update_advertisement(
 ):
     result = await db.execute(select(Advertisement).where(Advertisement.id == advertisement_id))
     advertisement = result.scalar_one_or_none()
-
+    
     if advertisement is None:
         raise HTTPException(status_code=404, detail="Advertisement not found")
     
     update_data = advertisement_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(advertisement, field, value)
-
+    
     await db.commit()
     await db.refresh(advertisement)
     return advertisement
@@ -36,16 +61,17 @@ async def delete_advertisement(
 ):
     result = await db.execute(select(Advertisement).where(Advertisement.id == advertisement_id))
     advertisement = result.scalar_one_or_none()
-
+    
     if advertisement is None:
         raise HTTPException(status_code=404, detail="Advertisement not found")
     
     await db.delete(advertisement)
     await db.commit()
+    
+    return {"message": "Advertisement deleted successfully"}
 
-    return {"message": "Advertisement deleted successffuly"}
-
-@router.get("/", response_model=list[AdvertisementSchema])
+# ИСПРАВЛЕНИЕ: Убрал слеш в пути, теперь путь будет "/advertisement"
+@router.get("", response_model=list[AdvertisementSchema])
 async def search_advertisements(
     title: Optional[str] = Query(None),
     description: Optional[str] = Query(None),
@@ -55,7 +81,7 @@ async def search_advertisements(
     db: AsyncSession = Depends(get_db)
 ):
     query = select(Advertisement)
-
+    
     conditions = []
     if title:
         conditions.append(Advertisement.title.ilike(f"%{title}%"))
@@ -67,10 +93,10 @@ async def search_advertisements(
         conditions.append(Advertisement.price >= min_price)
     if max_price is not None:
         conditions.append(Advertisement.price <= max_price)
-
+    
     if conditions:
         query = query.where(or_(*conditions))
-
+    
     result = await db.execute(query)
     advertisements = result.scalars().all()
     return advertisements

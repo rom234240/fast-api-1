@@ -14,7 +14,7 @@ class AdvertisementCreate(AdvertisementBase):
 class AdvertisementUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    price: Optional[str] = None
+    price: Optional[float] = None
     author: Optional[str] = None
 
 class Advertisement(AdvertisementBase):
