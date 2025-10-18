@@ -1,0 +1,61 @@
+@baseUrl = http://localhost:8000
+
+### 0. Проверка статуса базы данных
+GET {{baseUrl}}/db-status
+
+### 1. Проверка здоровья приложения
+GET {{baseUrl}}/health
+
+### 2. Создание объявления - POST /advertisement
+POST {{baseUrl}}/advertisement
+Content-Type: application/json
+
+{
+  "title": "Продам MacBook Pro 2022",
+  "description": "Состояние идеальное, 16ГБ RAM, 512ГБ SSD",
+  "price": 150000.0,
+  "author": "Алексей Петров"
+}
+
+### 3. Создание второго объявления
+POST {{baseUrl}}/advertisement
+Content-Type: application/json
+
+{
+  "title": "Куплю велосипед горный",
+  "description": "Ищу горный велосипед в хорошем состоянии",
+  "price": 25000.0,
+  "author": "Мария Сидорова"
+}
+
+### 4. Получение по ID - GET /advertisement/{id}
+GET {{baseUrl}}/advertisement/1
+
+### 5. Обновление объявления - PATCH /advertisement/{id} (ИСПРАВЛЕННЫЙ ТЕСТ)
+PATCH {{baseUrl}}/advertisement/1
+Content-Type: application/json
+
+{
+  "price": 140000.0,
+  "description": "Срочная продажа! Цена снижена!"
+}
+
+### 6. Поиск по полям - GET /advertisement?{query}
+GET {{baseUrl}}/advertisement?title=MacBook&min_price=100000
+
+### 7. Удаление объявления - DELETE /advertisement/{id}
+DELETE {{baseUrl}}/advertisement/2
+
+### 8. Проверка удаления (должен вернуть 404)
+GET {{baseUrl}}/advertisement/2
+
+### 9. Тест ошибки - несуществующее объявление
+GET {{baseUrl}}/advertisement/999
+
+### 10. Тест ошибки - невалидные данные при создании (ИСПРАВЛЕННЫЙ ТЕСТ)
+POST {{baseUrl}}/advertisement
+Content-Type: application/json
+
+{
+  "title": "Только заголовок",
+}
