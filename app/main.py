@@ -6,16 +6,14 @@ from app.routers import advertisements
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # ИСПРАВЛЕНИЕ: Ждем 10 секунд перед созданием таблиц
     print("⏳ Ожидание запуска базы данных...")
     await asyncio.sleep(10)
     
-    # Пытаемся создать таблицы
     success = await create_tables()
     if success:
-        print("✅ Приложение готово к работе")
+        print("Приложение готово к работе")
     else:
-        print("⚠️ Приложение запущено, но таблицы не созданы")
+        print("Приложение запущено, но таблицы не созданы")
     
     yield
     
