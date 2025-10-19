@@ -9,7 +9,6 @@ from app.schemas.advertisement import Advertisement as AdvertisementSchema, Adve
 
 router = APIRouter(prefix="/advertisement", tags=["advertisements"])
 
-# ИСПРАВЛЕНИЕ: Убрал слеш в пути, теперь путь будет "/advertisement"
 @router.post("", response_model=AdvertisementSchema)
 async def create_advertisement(
     advertisement: AdvertisementCreate,
@@ -70,7 +69,6 @@ async def delete_advertisement(
     
     return {"message": "Advertisement deleted successfully"}
 
-# ИСПРАВЛЕНИЕ: Убрал слеш в пути, теперь путь будет "/advertisement"
 @router.get("", response_model=list[AdvertisementSchema])
 async def search_advertisements(
     title: Optional[str] = Query(None),
