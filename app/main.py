@@ -6,7 +6,7 @@ from app.routers import advertisements
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("⏳ Ожидание запуска базы данных...")
+    print("Ожидание запуска базы данных...")
     await asyncio.sleep(10)
     
     success = await create_tables()
